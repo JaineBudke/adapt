@@ -1,5 +1,6 @@
 package br.com.adapt.application.service;
 
+import br.com.adapt.application.domain.Category;
 import br.com.adapt.application.model.Course;
 import br.com.adapt.application.repository.CourseRepository;
 import br.com.adapt.framework.domain.Status;
@@ -50,13 +51,23 @@ public class CourseService extends ResourceService<Course> {
         		//throw new InvalidTaskException("Tarefa inválida.");
         	}
         } else { //Se não for rotina, prioridade e tempo esperado são obrigatorios
-        	Integer expectedTime = entity.getExpectedTime();
-        	if(entity.getPriority() == null || expectedTime == 0) {
+        	//Integer expectedTime = entity.getExpectedTime();
+        	//if(entity.getCategory() == null || expectedTime == 0) {
         		//throw new InvalidTaskException("Tarefa inválida.");
-        	}
+        	//}
         	entity.setStartDate(null);
         	entity.setEndDate(null);
         }	
+        
+        // verifica se qual a categoria da atividade
+        if( entity.getCategory() == Category.CLASS ){
+        	entity.setExpectedTime(90);
+        } else if(entity.getCategory() == Category.EXTRA ){
+        	entity.setExpectedTime(90);
+        } else if(entity.getCategory() == Category.SUPPORT ){
+        	entity.setExpectedTime(60);
+        }
+
         
         return entity;
 
@@ -66,6 +77,7 @@ public class CourseService extends ResourceService<Course> {
 	public Course saveResource(Course entity, Scheduler scheduler) throws InvalidTaskException {
         entity.setScheduler(scheduler);
         entity.setStatus(Status.TODO);
+        
         
         save( entity );
          
@@ -79,7 +91,7 @@ public class CourseService extends ResourceService<Course> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 
 
 	@Override
@@ -116,9 +128,6 @@ public class CourseService extends ResourceService<Course> {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return taskRepository.findRoutineByUserEmail(auth.getName());
 	}
-
-	
-
 	
 	
 }
